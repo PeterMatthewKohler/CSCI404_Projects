@@ -15,6 +15,10 @@
 
 using actionCostPair = std::pair<node*, int>;
 
+std::pair<int, bool> pathCost(node* ptr, node* ptrOrigin);
+
+bool compare(node* a, node* b);
+
 std::map<std::string, node*> create_graph(std::string filename);
 
 node* explore(std::map<std::string, node*> map, std::string origin_city, std::string destination_city);

@@ -12,4 +12,7 @@ set(SOURCES ${CMAKE_SRC_DIR}/find_route.cpp)
 add_executable(find_route ${SOURCES})
 target_include_directories(find_route PRIVATE ${CMAKE_INCLUDE_DIR})
 
+#Copy test files to build folder
+file(COPY test_files DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 

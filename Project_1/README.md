@@ -17,17 +17,23 @@ The second function is called "explore" which implements breadth-first search us
 ## Build and Usage Instructions
 To build the code cmake is required. The code has been built successfully with cmake version 3.22.1, but it should probably(?) compile on an earlier version such as 3.16.
 
-To build the code, extract the code from the zip file. Then enter the extracted folder in your terminal and build the project using cmake:
+To build the code, extract the code from the zip file. Then enter the extracted folder in your terminal and generate the build files using cmake:
 ```
-$ cmake .
+$ cmake -S . -B build
 ```
-Next run the makefile that cmake built:
+This will place all of the build files in a new folder called "build".\
+Next build the project using the cmake-generated build files:
 ```
-$ make
+$ cmake --build build
 ```
-This creates the executable "find_route" that you will run to run the code.
+This creates the executable "find_route" in the folder "build" that you will use to run the code.
 
-As required in the problem statement, the program has 3 CLI input arguments:
+Navigate to the newly created "build" folder.
+```
+$ cd build
+```
+
+As required in the problem statement, the program has 3 CLI arguments:
 ```
 $ ./find_route [input_filename] [origin_city] [destination_city]
 ```

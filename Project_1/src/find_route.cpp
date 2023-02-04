@@ -6,6 +6,34 @@
 
 #include "find_route.h"
 
+// Returns total cost from input city to origin
+std::pair<int, bool> pathCost(node* ptr, node* ptrOrigin){
+    int pathCost = 0;
+    bool repeat = false;    // True if ancestor in tree is a repeat
+    std::string inputState = ptr->state;
+
+    // Find the associated milage from city to origin
+    while (ptr != ptrOrigin){
+        for (auto i : ptr->actionList){
+            if (i.first->state == ptr->parent->state){
+                // Check and see if the parent node is a repeat of the original input city
+                if (i.first->state == inputState){
+                    // If it is a repeat, don't care about the path cost since we aren't going to add it to the queue
+                    repeat = true;
+                    return std::make_pair(pathCost, repeat);
+                }
+                pathCost += i.second;
+                break;
+            }
+        }
+        ptr = ptr->parent;
+    }
+    return std::make_pair(pathCost, repeat);
+}
+
+// Comparator function used to implement min priority queue for member of node class
+bool compare(node* a, node* b){return a->pathCost > b->pathCost;}
+
 std::map<std::string, node*> create_graph(std::string filename){
     std::string str;
     std::fstream file;
@@ -62,45 +90,51 @@ std::map<std::string, node*> create_graph(std::string filename){
 }
 
 node* explore(std::map<std::string, node*> map, std::string origin_city, std::string destination_city){
-    // Create a standard FIFO queue for exploration
-    std::queue<node*> queue;
-
-    // Boolean to signal if we've found the destination city
-    bool goal_found = false;
+    // Create a priority min queue for exploration
+    std::priority_queue<node*, std::vector<node*>, decltype(&compare)> queue(compare);
 
     // Get the node of the origin city
-    node* ptr = map.find(origin_city)->second;
-    // Check to see if we've passed the realistic # of nodes explored to find the goal node
+    node* ptrOrigin = map.find(origin_city)->second;
+    node* ptrParent = ptrOrigin;
+    node* ptrNext = nullptr;
+    // A check to see if we've passed the realistic # of nodes explored to find the goal node
     int explore_count = 0;
 
-    while (!goal_found){
-        // Add all nodes newly added to the fringe to the queue to be explored
-        std::vector<actionCostPair> actions = ptr->actionList;
+    while (true){
+        // Get the new fringe from the explored node
+        std::vector<actionCostPair> actions = ptrParent->actionList;
+        // Add all new fringe nodes to the queue to be explored
         for (auto i : actions){
-            // Set the preceding node as the parent, only if it hasn't already been assigned!
-            if (i.first->parent == nullptr){
-                i.first->parent = ptr;
+            // Get the node we are adding to the fringe and make a new copy
+            ptrNext = new node(map.find(i.first->state)->second);
+            // Set the preceding node as the parent
+            ptrNext->parent = ptrParent;
+            // Check for cyclic repeat and calculate path cost back to Origin
+            std::pair<int,bool> pair = pathCost(ptrNext, ptrOrigin);
+            // If it is not repeat, add to queue
+            if (!pair.second){
+                // Update path cost
+                ptrNext->pathCost = pair.first;
+                // Push into priority queue
+                queue.push(ptrNext);
             }
-            // Check and see if the new node on the fringe is the goal node
-            if (i.first->state == destination_city){
-                ptr = i.first;
-                goal_found = true;
-                break;
-            }
-            queue.push(i.first);
         }
-        // Now explore the next node in the queue assuming we haven't found the goal node
-        if (!goal_found){
-            ptr = queue.front();
-            queue.pop();
-            explore_count++;
+        // Now explore the next node in the queue
+        ptrParent = queue.top();
+
+        // Check and see if the newly explored node is the goal node
+        if (ptrParent->state == destination_city){
+            // We have found the goal node
+            return ptrParent;
         }
+        queue.pop();
+        explore_count++;
+
         if (explore_count > 10*map.size()){ // Quit after we've explored 10*(Total # of Nodes in Graph)
             // Can't find the city node. Assume it's not reachable.
             return nullptr;
         }
     }
-    return ptr;
 }
 
 
@@ -164,8 +198,7 @@ int main(int argc, char** argv){
 
     // Print out the resultant distance and route
     // Route vector should always be 1 element larger than mileage vector
-    std::cout << "distance: " << sum << " km\n";
-    std::cout << "route:\n";
+    std::cout << "distance: " << sum << " km\nroute:\n";
     for (int index = mileage.size()-1; index >= 0; index--){
         std::cout << route[index+1] << " to " << route[index] << ", " << mileage[index] << " km\n";
     }

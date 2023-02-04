@@ -14,11 +14,19 @@ public:
     {
         state = state_input;
         parent = nullptr;
-        
+    }
+    // Copy constructor
+    node(const node* ptr)
+    {
+        state = ptr->state;
+        parent = ptr->parent;
+        actionList = ptr->actionList;
+        pathCost = 0;   // Do not copy the path cost
     }
 
     std::string state;  // Gets set during instantiation
     node* parent;       // Gets set when during exploration
+    int pathCost;       // The total path cost from the node back to the Origin city
 
     // Vector used to store all possible actions to take from a given city
     std::vector<actionCostPair> actionList; 
