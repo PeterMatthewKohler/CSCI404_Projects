@@ -18,7 +18,7 @@ The third function is called "explore" which implements Uniform-cost search usin
 ## Build and Usage Instructions
 To build the code cmake is required. The code has been built successfully with cmake version 3.22.1, but it should probably(?) compile on an earlier version such as 3.16.
 
-To build the code, extract the code from the zip file. Then enter the extracted folder in your terminal and generate the build files using cmake:
+To build the code, extract the code from the zip file into a new folder. Then enter the newly created folder with the extracted code in your terminal and generate the build files using cmake:
 ```
 $ cmake -S . -B build
 ```

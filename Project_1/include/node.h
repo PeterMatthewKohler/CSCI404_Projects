@@ -25,7 +25,7 @@ public:
     }
 
     std::string state;  // Gets set during instantiation
-    node* parent;       // Gets set when during exploration
+    node* parent;       // Gets set during exploration
     int pathCost;       // The total path cost from the node back to the Origin city
 
     // Vector used to store all possible actions to take from a given city
