@@ -1,0 +1,43 @@
+Test 1:
+Input: ./findroute testfiles/input1.txt Luebeck Nuremberg
+Expected Output:
+distance: 752 km
+route:
+Luebeck to Hamburg, 63 km
+Hamburg to Hannover, 153 km
+Hannover to Magdeburg, 148 km
+Magdeburg to Leipzig, 125 km
+Leipzig to Nuremberg, 263 km
+
+Test 2:
+Input: ./find_route test_files/input1.txt Munich Luebeck
+Expected Output:
+distance: 923 km
+route:
+Munich to Nuremberg, 171 km
+Nuremberg to Leipzig, 263 km
+Leipzig to Magdeburg, 125 km
+Magdeburg to Hannover, 148 km
+Hannover to Hamburg, 153 km
+Hamburg to Luebeck, 63 km
+
+Test 3:
+Input: ./find_route test_files/input1.txt Munich Manchester
+Expected Output: 
+distance: infinity
+route:
+none
+
+Test 4: 
+Input: ./find_route test_files/input1.txt Manchester Dortmund
+Expected Output: 
+distance: infinity
+route:
+none
+
+Test 5:
+Input: ./find_route test_files/input1.txt Bremen Bremen
+distance: 0 km
+route:
+Bremen to Bremen, 0 km
+

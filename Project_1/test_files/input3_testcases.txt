@@ -1,0 +1,41 @@
+Test 1:
+Input: ./find_route test_files/input3.txt A K
+Expected Output:
+distance: 115 km
+route:
+A to C, 10 km
+C to F, 30 km
+F to I, 35 km
+I to J, 25 km
+J to K, 15 km
+
+Test 2:
+Input: ./find_route test_files/input3.txt I B
+Expected Output:
+distance: 68 km
+route:
+I to F, 35 km
+F to E, 15 km
+E to B, 18 km
+
+Test 3:
+Input: ./find_route test_files/input3.txt A M
+Expected Output:
+distance: infinity
+route:
+none
+
+Test 4:
+Input: ./find_route test_files/input3.txt M A
+Expected Output:
+distance: infinity
+route:
+none
+
+Test 5:
+Input: ./find_route test_files/input3.txt A A
+Expected Output:
+distance: 0 km
+route:
+A to A, 0 km
+
