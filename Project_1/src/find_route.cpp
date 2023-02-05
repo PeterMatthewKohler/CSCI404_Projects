@@ -130,7 +130,7 @@ node* explore(std::map<std::string, node*> map, std::string origin_city, std::st
         queue.pop();
         explore_count++;
 
-        if (explore_count > 10*map.size()){ // Quit after we've explored 10*(Total # of Nodes in Graph)
+        if (explore_count > 40*map.size()){ // Quit after we've explored 40*(Total # of Nodes in Graph)
             // Can't find the city node. Assume it's not reachable.
             return nullptr;
         }
