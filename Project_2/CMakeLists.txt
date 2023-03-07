@@ -12,5 +12,8 @@ set(SOURCES ${CMAKE_SRC_DIR}/maxconnect4.cpp)
 add_executable(maxconnect4 ${SOURCES})
 target_include_directories(maxconnect4 PRIVATE ${CMAKE_INCLUDE_DIR})
 
+#Copy test files to build folder
+file(COPY test_files DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 
 

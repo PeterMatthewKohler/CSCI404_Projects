@@ -28,3 +28,5 @@ void printBoard(const Matrix& board);
 int miniMax(node& input, int depth, int alpha, int beta, bool maximizingPlayer);
 
 int evalBoard(Matrix board);
+
+void saveBoard(Matrix board, std::fstream& file, std::string outputName, const int next);

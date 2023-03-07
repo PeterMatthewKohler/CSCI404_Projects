@@ -330,73 +330,161 @@ int evalBoard(Matrix board) {    // Heuristic used for evaluating board states
     return score.first - score.second;
 }
 
+void saveBoard(Matrix board, std::fstream& file, std::string outputName, const int next) {  // Saves board in a designated file
+    file.open(outputName, std::fstream::out | std::fstream::trunc);     // We don't care what's currently in the output file
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 7; j++) {
+            file << board[i][j];
+        }
+        file << "\n";
+    }
+    file << next;
+    file.close();
+}
+
 int main(int argc, char** argv) {
+    // Check Input Args
+    if (argc < 5){
+        std::cout << "ERROR: Usage error. Please consult the README for the correct input arguments.\n";
+        return -1;
+    }
+    // Determine Game Mode
     bool gameMode = false;  // If false, one-move. If true, interactive;
-    std::string str = "interactive";
-    if (!std::strcmp(str.c_str(),argv[1])){gameMode = true;}
-    // Parse the input file
+    bool playerNext = false; // If true, it is human player's turn
+    std::string str1 = "interactive";
+    std::string str2 = "one-move";
+    if (std::strcmp(str1.c_str(),argv[1]) && std::strcmp(str2.c_str(),argv[1])){  // Check determing input arg for game mode is bad/wrong
+        std::cout << "ERROR: Please input a correct game mode.\n";
+        return -1;
+    }
+    if (!std::strcmp(str1.c_str(),argv[1])){
+        gameMode = true;
+        // In interactive mode, determine who plays next
+        str1 = "computer-next";
+        str2 = "human-next";
+        if (!std::strcmp(str2.c_str(),argv[3])){playerNext = true;}
+        if (std::strcmp(str1.c_str(),argv[3]) && std::strcmp(str2.c_str(),argv[3])){    // Check determing input arg for next turn is bad/wrong
+            std::cout << "ERROR: Please input a correct input arg for who's turn is next.\n";
+            return -1;
+        }
+    }
+
+    // Check and Parse the input file
+    std::string str;
     std::fstream file;
     file.open(argv[2]);
+    if(!file.is_open()){
+        std::cout << "ERROR: Please input a valid filename.\n";
+        return -1;
+    }
     Matrix board = createBoard(file);
     node game(board);
     file >> str;
     file.close();
     int next = int(str[0] - '0');
 
-    // --------- DEBUGGING
+    // Get the depth
+    int depth;
+    if (!std::isdigit(*argv[4])) {  // If it's not a number
+        std::cout << "ERROR: Please enter a valid number for the depth.\n";
+        return -1;
+    }
+    else{                           // If it is a number
+        depth = std::atoi(argv[4]);
+        if (depth <= 0) {
+            std::cout << "ERROR: Please enter a valid number for the depth.\n";
+            return -1;
+        }
+    }
+    // Start playing
+    std::fstream output;
+    // --------- Print initial board state and score
     printBoard(game.board);
     std::cout << "next: " << next << "\n\n";
-    // ---------
-
     auto score = calcScore(game.board);
     std::cout << "Score: " << score.first << " - " << score.second << "\n";
+    // ---------
 
     bool terminal = false;
     int move;
-    // ---------------DEBUGGING---------------
-    // miniMax(game, 7, INT_MIN, INT_MAX, true);
-    // std::cout << "======DECISION=========\n";
-    // std::cout << "move: " << game.bestChoice << "\n";
-    // ---------------------------------------
+
     if (gameMode){  // interactive mode
+        str1 = "computer.txt";
+        str2 = "human.txt";
         while (!terminal) {
-            // Now computer's turn
-            miniMax(game, 9, INT_MIN, INT_MAX, true);
-            std::cout << "\nComputer's decision: " << game.bestChoice + 1 << "\n";
-            // Play algorithm's choice
-            playMove(game.board, game.bestChoice+1, next);
-            next++;
-            // Check for terminal state of board being full
-            terminal = terminalCheck(game.board);
-            if (terminal){break;}
-            // --------- DEBUGGING
-            printBoard(game.board);
-            std::cout << "next: " << next << "\n\n";
-            score = calcScore(game.board);
-            std::cout << "Score: " << score.first << " - " << score.second << "\n";
-            // ---------
-            bool valid = false;
-            while (!valid){
-                std::cout << "Please enter a move." << "\n";
-                std::cin >> move;
-                valid = playMove(game.board, move, next);
-                if (!valid){std::cout << "Please enter a valid move" << "\n";}
+            if (playerNext){
+                // Player's turn
+                bool valid = false;
+                while (!valid){
+                    std::cout << "Please enter a move." << "\n";
+                    std::cin >> move;
+                    valid = playMove(game.board, move, next);
+                    if (!valid){std::cout << "Please enter a valid move" << "\n";}
+                }
+                if (next == 1){next++;}
+                else{next--;}
+                // --------- Print current board state and score
+                printBoard(game.board);
+                std::cout << "next: " << next << "\n\n";
+                score = calcScore(game.board);
+                std::cout << "Score: " << score.first << " - " << score.second << "\n";
+                // ---------
+                // Save board state in a text file human.txt
+                saveBoard(game.board, output, str2, next);
+                // It is now the computer player's turn
+                playerNext = false;
+                // Check for terminal state of board being full
+                terminal = terminalCheck(game.board);
+                if (terminal){break;}
             }
-            next--;
-            // --------- DEBUGGING
-            printBoard(game.board);
-            std::cout << "next: " << next << "\n\n";
-            score = calcScore(game.board);
-            std::cout << "Score: " << score.first << " - " << score.second << "\n";
-            // ---------
-            // Check for terminal state of board being full
-            terminal = terminalCheck(game.board);
+            else{
+                // Computer's turn
+                miniMax(game, depth, INT_MIN, INT_MAX, true);
+                std::cout << "\nComputer's decision: " << game.bestChoice + 1 << "\n";
+                // Play algorithm's choice
+                playMove(game.board, game.bestChoice+1, next);
+                if (next == 1){next++;}
+                else{next--;}
+                // --------- Print current board state and score
+                printBoard(game.board);
+                std::cout << "next: " << next << "\n\n";
+                score = calcScore(game.board);
+                std::cout << "Score: " << score.first << " - " << score.second << "\n";
+                // ---------
+                // Save board state in a text file computer.txt
+                saveBoard(game.board, output, str1, next);
+                // It is now the human player's turn
+                playerNext = true;
+                // Check for terminal state of board being full
+                terminal = terminalCheck(game.board);
+                if (terminal){break;}
+            }
         }
     }
     else{   // One-move mode
-
+        std::string outputName = argv[3];
+        std::cout << "Outputname is : " << outputName << std::endl;
+        terminal = terminalCheck(game.board);
+        if (terminal){
+            std::cout << "\nBoard is full. End.\n";
+            return 0;
+        }
+        miniMax(game, depth, INT_MIN, INT_MAX, true);
+        std::cout << "\nComputer's decision: " << game.bestChoice + 1 << "\n";
+        // Play algorithm's choice
+        playMove(game.board, game.bestChoice+1, next);
+        if (next == 1){next++;}
+        else{next--;}
+        // --------- Print current board state and score
+        printBoard(game.board);
+        std::cout << "next: " << next << "\n\n";
+        score = calcScore(game.board);
+        std::cout << "Score: " << score.first << " - " << score.second << "\n";
+        // ---------
+        // Save board state in a text file designated by the input argument
+        saveBoard(game.board, output, outputName, next);
     }
-    // --------- DEBUGGING
+    // --------- Print final board state and score
     std::cout << "=========FINAL BOARD STATE==========\n";
     printBoard(game.board);
     std::cout << "next: " << next << "\n\n";
