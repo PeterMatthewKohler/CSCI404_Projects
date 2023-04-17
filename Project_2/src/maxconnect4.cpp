@@ -416,10 +416,10 @@ int main(int argc, char** argv) {
                 // Player's turn
                 bool valid = false;
                 while (!valid){
-                    std::cout << "Please enter a move." << "\n";
+                    std::cout << "Please enter a move(number) between 1 and 7." << "\n";
                     std::cin >> move;
                     valid = playMove(game.board, move, next);
-                    if (!valid){std::cout << "Please enter a valid move" << "\n";}
+                    if (!valid){std::cout << "ERROR: Invalid move." << "\n";}
                 }
                 if (next == 1){next++;}
                 else{next--;}
